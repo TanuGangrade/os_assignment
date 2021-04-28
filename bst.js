@@ -1,6 +1,5 @@
 "use strict";
 
-// Node vs browser behavior
 if (typeof module !== 'undefined') {
     var binarytree = require('./binarytree'),
         NIL = binarytree.NIL;
@@ -9,9 +8,6 @@ if (typeof module !== 'undefined') {
         exports = bst;
 }
 
-// bstSearch: Search the tree for value.
-// Returns the matching node.
-// Based on TREE-SEARCH defintion in CLRS 12.2
 function bstSearch (tree, value) {
     if (tree === NIL) {
         return null;
@@ -24,9 +20,6 @@ function bstSearch (tree, value) {
     }
 }
 
-// bstMin: Return the maximum (right-most) node or null if the tree
-// is empty (NIL).
-// Based on TREE-MINIMUM definition in CLRS 12.2
 function bstMin(tree) {
     if (tree === NIL) {
         return null;
@@ -37,9 +30,6 @@ function bstMin(tree) {
     return tree;
 }
 
-// bstMax: Return the maximum (right-most) node or null if the tree
-// is empty (NIL).
-// Based on TREE-MAXIMUM definition in CLRS 12.2
 function bstMax(tree) {
     if (tree === NIL) {
         return null;
@@ -50,9 +40,6 @@ function bstMax(tree) {
     return tree;
 }
 
-// bstInsert: Add the value to the tree. Returns new tree (root node
-// could have changed)
-// Based on TREE-INSERT definition in CLRS 12.3
 function bstInsert (tree, node) {
     var x = tree,
         y = NIL,
@@ -69,7 +56,6 @@ function bstInsert (tree, node) {
 
     z.p = y;
     if (y === NIL) {
-        // tree was empty
         tree = z;
     } else if (z.cmp(y) < 0) {
         y.left = z;
@@ -79,8 +65,6 @@ function bstInsert (tree, node) {
     return tree;
 }
 
-// bstTransplant
-// Based on TRANSPLANT definition in CLRS 12.3
 function bstTransplant(tree, dst, src) {
     var u = dst, v = src;
     if (u.p === NIL) {
@@ -96,8 +80,6 @@ function bstTransplant(tree, dst, src) {
     return tree;
 }
 
-// bstRemove
-// Based on TREE-DELETE definition in CLRS 12.3
 function bstRemove (tree, node) {
     var z = node,
         y;
@@ -119,15 +101,8 @@ function bstRemove (tree, node) {
     return tree;
 }
 
-// BST: Binary Search Tree Object
-//   - Constructor: new BST(cmpFn) - create/construct a new BST
-//     object. If cmpFn is not provided then a numeric comparison is
-//     done on nodeX.val
-//   - API/Methods: all binary tree methods plus search, min, max,
-//     remove, and insert.
 function BST (cmpFn) {
     var self = this,
-        // call parent/super constructor
         api = binarytree.BinaryTree.call(self, cmpFn);
 
     api.name   = "Binary Search Tree";
@@ -139,7 +114,6 @@ function BST (cmpFn) {
     api.min    = function()      { return bstMin(self.root); };
     api.max    = function()      { return bstMax(self.root); };
 
-    // Return the API functions (public interface)
     return api;
 }
 

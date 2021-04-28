@@ -1,6 +1,5 @@
 "use strict";
 
-// Node vs browser behavior
 if (typeof module !== 'undefined') {
     var binarytree = require('./binarytree'),
         NIL = binarytree.NIL,
@@ -10,15 +9,14 @@ if (typeof module !== 'undefined') {
         exports = rbt;
 }
 
-// CLRS 13.2
 function treeLeftRotate(tree,node) {
     var x = node,
-        y = x.right;     // set y
-    x.right = y.left;    // turn y's left into x's right
+        y = x.right;     
+    x.right = y.left;    
     if (y.left !== NIL) {
         y.left.p = x;
     }
-    y.p = x.p;           // link x's parent to y
+    y.p = x.p;           
     if (x.p === NIL) {
         tree = y;
     } else if (x === x.p.left) {
@@ -26,21 +24,20 @@ function treeLeftRotate(tree,node) {
     } else {
         x.p.right = y;
     }
-    y.left = x;         // put x on y's left
+    y.left = x;        
     x.p = y;
 
     return tree;
 }
 
-// CLRS 13.2
 function treeRightRotate(tree,node) {
     var x = node,
-        y = x.left;      // set y
-    x.left = y.right;    // turn y's right into x's left
+        y = x.left;      
+    x.left = y.right;    
     if (y.right !== NIL) {
         y.right.p = x;
     }
-    y.p = x.p;           // link x's parent to y
+    y.p = x.p;           
     if (x.p === NIL) {
         tree = y;
     } else if (x === x.p.right) {
@@ -48,14 +45,13 @@ function treeRightRotate(tree,node) {
     } else {
         x.p.left = y;
     }
-    y.right = x;         // put x on y's right
+    y.right = x;        
     x.p = y;
 
     return tree;
 }
 
 
-// CLRS 13.3
 function redblackInsertFixup(tree, node) {
     var y, z = node;
     while (z.p.color === 'r') {
@@ -102,7 +98,6 @@ function redblackInsertFixup(tree, node) {
     return tree;
 }
 
-// CLRS 13.3
 function redblackInsert(tree, node) {
     node.color = 'r';
 
@@ -121,7 +116,6 @@ function redblackInsert(tree, node) {
 
     z.p = y;
     if (y === NIL) {
-        // tree was empty
         tree = z;
     } else if (z.cmp(y) < 0) {
         y.left = z;
@@ -136,8 +130,6 @@ function redblackInsert(tree, node) {
     return tree;
 }
 
-// redblackTransplant
-// Based on RB-TRANSPLANT definition in CLRS 13.4
 function redblackTransplant(tree, dst, src) {
     var u = dst, v = src;
     if (u.p === NIL) {
@@ -151,16 +143,13 @@ function redblackTransplant(tree, dst, src) {
     return tree;
 }
 
-// CLRS 13.4
 function redblackRemoveFixup(tree, node) {
     var x = node,
         w;
     while (x !== tree && x.color === 'b') {
-        //console.log("2: x", x.val);
         if (x === x.p.left) {
             w = x.p.right;
             if (w.color === 'r') {
-                //console.log("2.1: ", JSON.stringify(bst.treeTuple(tree)));
                 // case 1
                 w.color = 'b';
                 x.p.color = 'r';
@@ -168,20 +157,17 @@ function redblackRemoveFixup(tree, node) {
                 w = x.p.right;
             }
             if (w.left.color === 'b' && w.right.color ==='b') {
-                //console.log("2.2: ", JSON.stringify(bst.treeTuple(tree)));
                 // case 2
                 w.color = 'r';
                 x = x.p;
             } else {
                 if (w.right.color === 'b') {
-                    //console.log("2.3: ", JSON.stringify(bst.treeTuple(tree)));
                     // case 3
                     w.left.color = 'b';
                     w.color = 'r';
                     tree = treeRightRotate(tree,w);
                     w = x.p.right;
                 }
-                //console.log("2.4: ", JSON.stringify(bst.treeTuple(tree)));
                 // case 4
                 w.color = x.p.color;
                 x.p.color = 'b';
@@ -192,7 +178,6 @@ function redblackRemoveFixup(tree, node) {
         } else {
             w = x.p.left;
             if (w.color === 'r') {
-                //console.log("3.1: ", JSON.stringify(bst.treeTuple(tree)));
                 // case 1
                 w.color = 'b';
                 x.p.color = 'r';
@@ -200,20 +185,17 @@ function redblackRemoveFixup(tree, node) {
                 w = x.p.left;
             }
             if (w.right.color === 'b' && w.left.color ==='b') {
-                //console.log("3.2: ", JSON.stringify(bst.treeTuple(tree)));
                 // case 2
                 w.color = 'r';
                 x = x.p;
             } else {
                 if (w.left.color === 'b') {
-                    //console.log("3.3: ", JSON.stringify(bst.treeTuple(tree)));
                     // case 3
                     w.right.color = 'b';
                     w.color = 'r';
                     tree = treeLeftRotate(tree,w);
                     w = x.p.left;
                 }
-                //console.log("3.4: ", JSON.stringify(bst.treeTuple(tree)));
                 // case 4
                 w.color = x.p.color;
                 x.p.color = 'b';
@@ -222,33 +204,26 @@ function redblackRemoveFixup(tree, node) {
                 x = tree;
             }
         }
-        //console.log("4: ", JSON.stringify(bst.treeTuple(tree)));
     }
     x.color = 'b';
     return tree;
 }
 
-// CLRS 13.4
-// Different enough from treeRemove to deserve it's own function
 function redblackRemove(tree, node) {
     var z = node,
         y = z,
         x,
         origColor = y.color;
-    //console.log("1 z: ", bst.treeTuple(z));
     if (z.left === NIL) {
         x = z.right;
-        //console.log("1.1 x: ", bst.treeTuple(x));
         tree = redblackTransplant(tree,z,z.right);
     } else if (z.right === NIL) {
         x = z.left;
-        //console.log("1.2 x: ", bst.treeTuple(x));
         tree = redblackTransplant(tree,z,z.left);
     } else {
         y = bst.bstMin(z.right);
         origColor = y.color;
         x = y.right;
-        //console.log("1.3 x: ", binarytree.treeTuple(x));
         if (x && y.p === z) {
             x.p = y;
         } else {
@@ -262,21 +237,14 @@ function redblackRemove(tree, node) {
         y.color = z.color;
     }
     if (x && origColor === 'b') {
-        //console.log("1.10 x: ", binarytree.treeTuple(x));
         tree = redblackRemoveFixup(tree,x);
     }
     return tree;
 }
 
-// RBT: Red-Black Binary Search Tree Object
-//   - Constructor: new RBT(cmpFn) - create/construct a new RBT
-//     object. If cmpFn is not provided then a numeric comparison is
-//     done on nodeX.val
-//   - API/Methods: all BST methods with remove and insert methods
-//     overridden to support Red-Black balancing.
+
 function RBT(cmpFn) {
     var self = this, api;
-    // call parent/super constructor
     api = bst.BST.call(self, cmpFn);
 
     api.name = "Red-Black Tree";
@@ -284,7 +252,6 @@ function RBT(cmpFn) {
     self.insertFn = redblackInsert;
     self.removeFn = redblackRemove;
 
-    // Return the API functions (public interface)
     return api;
 }
 

@@ -1,21 +1,14 @@
 "use strict";
 
-// Node vs browser behavior
 if (typeof module === 'undefined') {
     var binarytree = {},
         exports = binarytree;
 }
 
-// defaultCompareFn: The default compare function.
-// Returns:
-//   0   if node1.val and node2.val are equal
-//   < 0 if node1.val < node2.val
-//   > 0 if node1.val > node2.val
 function defaultCompareFn (node1, node2) {
     return node1.val - node2.val;
 }
 
-// Statistics tracking.
 var STATS = {};
 function GET_STATS () {
     return STATS;
@@ -31,10 +24,7 @@ RESET_STATS();
 
 var NIL;
 
-// The Node object is used as the basis for all the binary tree
-// derived structures. Pointer related operations diverge depending on
-// whether the tress are linked together using regular pointers or are
-// laid out in an array with children at 2i+1 and 2i+2.
+
 function Node(val, opts) {
     var id = Node.nextId++;
 
@@ -50,9 +40,7 @@ function Node(val, opts) {
         arr = opts.arr || null,
         idx = 0;
 
-    // Common functions/getters/setters. These are wrapped (rather
-    // than direct properties) in order to capture statistics about
-    // read/write access.
+
     this.__defineGetter__('id', function() {
         return id;
     });
@@ -87,15 +75,13 @@ function Node(val, opts) {
     });
 
 
-    // Use the compare function we were initialized with to compare
-    // ourself with another node.
+
     this.cmp = function(other) {
         STATS.compare++;
         return cmpFn(this, other);
     }
 
-    // Divergent based on whether we are a normal tree or using
-    // indexed arrays for our trees.
+    
     if (arr) {
         this.__defineGetter__('p', function() {
             STATS.read.p++;
@@ -138,7 +124,7 @@ function Node(val, opts) {
 
         this.swap = function(arr, other) {
             STATS.swap++;
-            STATS.write.p += 2; // NOTE: not really p, but keep track there
+            STATS.write.p += 2; 
             var nidx = this.idx,
                 oidx = other.idx,
                 ntmp = this,
@@ -186,8 +172,7 @@ function Node(val, opts) {
                 throw new Error("Node.swap called with NIL node");
             }
 
-            // If n2 is the parent, then swap them to make the immediate
-            // relation logic a single condition
+         
             if (n1.p === n2) {
                 var tmp = n1;
                 n1 = n2;
@@ -201,7 +186,6 @@ function Node(val, opts) {
                 n2left = n2.left,
                 n2right = n2.right;
 
-            // Swap n1 and n2 (up to 12 pointer updates)
             if (n1 === p2) {
                 // Adjacent: n1 is immediate parent of n2
                 n1.p = n2;
@@ -282,13 +266,9 @@ function Node(val, opts) {
 }
 Node.nextId = 0;
 
-// This is the sentinel node that is used instead of null pointers
-// (and is always black in the case of red-black trees).
 NIL = new Node('NIL', {p: NIL, color: 'b'});
 
-// treeTuple: Return a tuple hierarchy in the form: [val,left,right]
-// (or [val,color,left,right] in the case of Red-Black tree)
-// Note: an empty tree will return 'NIL'
+
 function treeTuple (tree) {
     if (tree === NIL) {
         return 'NIL';
@@ -304,11 +284,7 @@ function treeTuple (tree) {
     return res;
 }
 
-// treeReduce: walk the tree in the order specified, running the
-// action function against each node and accumulating the result in
-// result. The action function is called with the current result and
-// the node that is currently being processed.
-// Returns the final reduced result
+
 function treeReduce (result, node, action, order) {
     order = order||"in";  // pre, in, or post
 
@@ -322,12 +298,7 @@ function treeReduce (result, node, action, order) {
     return result;
 }
 
-// treeWalk: Walk the tree and return an array of all the values. The
-// walk order depends on order (a string) which may be:
-//   'in'   -> in-order walk
-//   'pre'  -> pre-order walk
-//   'post' -> post-order walk
-// Based on INORDER-TREE-WALK definition in CLRS 12.1
+
 function treeWalk (tree, order) {
     return treeReduce([], tree, function(res, node) {
         return res.concat([node.val]);
@@ -335,8 +306,6 @@ function treeWalk (tree, order) {
 }
 
 
-// treeLinks: Return a list of links: [[a, b], [b, c]]
-// Note: an empty tree will return null
 function treeLinks (tree) {
     return treeReduce([], tree, function(res, n) {
         var links = [];
@@ -350,8 +319,6 @@ function treeLinks (tree) {
     }, 'pre');
 }
 
-// treeDOT: Return DOT graph description
-// This can be fed to GraphViz to generate a rendering of the graph.
 function treeDOT(tree) {
     var dot;
     if ('color' in tree) {
@@ -378,12 +345,7 @@ function treeDOT(tree) {
 }
 
 
-// BinaryTree: Binary Tree Object
-//   - Constructor: new BinaryTree(cmpFn) - create/construct a new
-//     BinaryTree object using cmpFn.  If cmpFn is not provided then
-//     a numeric comparison is done on nodeX.val
-//   - API/Methods: walk, reduce. For debug/output: root, tuple,
-//     links, DOT.
+
 function BinaryTree (cmpFn) {
     if (typeof cmpFn === 'undefined') {
         cmpFn = defaultCompareFn;
@@ -412,7 +374,6 @@ function BinaryTree (cmpFn) {
         self.size--;
     };
     api.insert = function() {
-        // Allow one or more values to be inserted
         if (arguments.length === 1) {
             var node = new self.Node(arguments[0], {cmpFn: self.cmpFn});
             self.root = self.insertFn(self.root, node);
@@ -426,7 +387,6 @@ function BinaryTree (cmpFn) {
         }
     };
 
-    // Return the API functions (public interface)
     return api;
 }
 
